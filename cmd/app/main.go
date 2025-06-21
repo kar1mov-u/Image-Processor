@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"image-processor/api"
 	"image-processor/internal/database"
+	"os"
 
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 
 	"net/http"
@@ -15,6 +17,8 @@ import (
 
 func main() {
 
+	godotenv.Load()
+	jwtKey := os.Getenv("JWT_KEY")
 	log := log.New()
 
 	//connect to the DB
@@ -27,7 +31,7 @@ func main() {
 	defer dbConn.Close()
 
 	db := database.New(dbConn, log)
-	api := api.New(log, db)
+	api := api.New(log, db, jwtKey)
 
 	log.WithField("component", "api").Info("Starting Server..")
 	http.ListenAndServe(":9999", api.Routes)
